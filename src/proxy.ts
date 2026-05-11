@@ -14,6 +14,12 @@ export async function proxy(req: NextRequest) {
   });
 
   const isAuthenticated = !!token?.accessToken && !isVaultTokenExpired(token.accessToken as string);
+
+  // Disable registration when ALLOW_REGISTRATION=false
+  if (pathname === '/register' && process.env.ALLOW_REGISTRATION === 'false' && !isAuthenticated) {
+    return NextResponse.redirect(new URL('/login', nextUrl));
+  }
+
   const isAuthRoute = isRouteMatch(pathname, authRoutes);
   const isProtectedRoute = isRouteMatch(pathname, protectedRoutes);
 
